@@ -1,0 +1,94 @@
+/*
+DDL SCRIPTS : CREATE Bronze Tables
+SCript purpose:
+this script creates tables in the bronze schema dropping existinf tables if they already exist
+
+run this script to redefine the DDL Structure of 'bronze' Tables
+
+
+*/
+
+
+
+TRUNCATE TABLE bronze.crm_cust_info;
+TRUNCATE TABLE bronze.crm_prd_info;
+TRUNCATE TABLE bronze.crm_sales_details;
+TRUNCATE TABLE bronze.erp_cust_az12;
+TRUNCATE TABLE bronze.erp_loc_a101;
+TRUNCATE TABLE bronze.erp_px_cat_g1v2;
+
+SET @bronze_start=NOW();
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_crm/cust_info.csv'
+INTO TABLE bronze.crm_cust_info
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS
+(
+  @cst_id,
+  @cst_key,
+  @cst_firstname,
+  @cst_lastname,
+  @cst_marital_status,
+  @cst_gndr,
+  @cst_create_date
+)
+SET
+  cst_id = NULLIF(@cst_id, ''),
+  cst_key = NULLIF(@cst_key, ''),
+  cst_firstname = NULLIF(@cst_firstname, ''),
+  cst_lastname = NULLIF(@cst_lastname, ''),
+  cst_marital_status = NULLIF(@cst_marital_status, ''),
+  cst_gndr = NULLIF(@cst_gndr, ''),
+  cst_create_date = NULLIF(@cst_create_date, '');
+  
+SELECT * FROM bronze.crm_cust_info;
+SELECT COUNT(*) FROM bronze.crm_cust_info;
+  
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_crm/prd_info.csv'
+INTO TABLE bronze.crm_prd_info
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_crm/sales_details.csv'
+INTO TABLE bronze.crm_sales_details
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_erp/CUST_AZ12.csv'
+INTO TABLE bronze.erp_cust_az12
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS
+(
+  @cid,
+  @bdate,
+  @gen
+)
+SET
+  cid = NULLIF(@cid,''),
+  bdate = NULLIF(@bdate,''),
+  gen = NULLIF(@gen,'');
+
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_erp/LOC_A101.csv'
+INTO TABLE bronze.erp_loc_a101
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/sql-data-warehouse-project-main/datasets/source_erp/PX_CAT_G1V2.csv'
+INTO TABLE bronze.erp_px_cat_g1v2
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+
+SET @bronze_end = NOW();
+/*this gives exact time how much it takes to load data*/
+SELECT timestampdiff(SECOND,@bronze_start,@bronze_end)AS total_duration_seconds;
+SELECT timestampdiff(MINUTE,@bronze_start,@bronze_end)AS total_duration_minutes
+
