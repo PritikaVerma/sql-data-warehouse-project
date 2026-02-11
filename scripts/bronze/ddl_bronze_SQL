@@ -1,3 +1,12 @@
+/*
+DDL SCRIPTS : CREATE Bronze Tables
+SCript purpose:
+this script creates tables in the bronze schema dropping existinf tables if they already exist
+
+run this script to redefine the DDL Structure of 'bronze' Tables
+
+
+*/
 CREATE DATABASE Datawarehouse;
 USE Datawarehouse;
 CREATE SCHEMA bronze;
